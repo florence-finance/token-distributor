@@ -72,12 +72,13 @@ contract TokenDistributor is Ownable2Step, Pausable, ReentrancyGuard {
         GnosisSafeL2 _safe
     ) external onlyOwner {
         require(distributionStartTimestamp == 0, "already initialized");
-        require(token.balanceOf(address(this)) == _totalTokensToDistribute, "totalTokensToDistribute must match token balance of contract");
         require(_ethPerToken > 0, "ethPerToken must be greater 0");
         require(_maxEthContributionPerAddress > 0, "maxEthContributionPerAddress must be greater 0");
         require(_distributionStartTimestamp >= block.timestamp, "distributionStartTimestamp must be in the future");
         require(_distributionEndTimestamp > _distributionStartTimestamp, "distributionEndTimestamp must be after distributionStartTimestamp");
         require(_safe.getThreshold() > 2, "safe threshold must be greater 2");
+
+        token.safeTransferFrom(msg.sender, address(this), _totalTokensToDistribute);
 
         totalTokensToDistribute = _totalTokensToDistribute;
         ethPerToken = _ethPerToken;
